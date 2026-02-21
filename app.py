@@ -160,6 +160,7 @@ def fmt(valore: float) -> str:
 # --- UI ---
 def main():
     st.title("Calcolo Stipendio Netto")
+    st.image("aa.jpg")
     st.caption("Simulazione basata su aliquote IRPEF 2024 (3 scaglioni) e contributi INPS standard")
 
     modalita = st.selectbox(
