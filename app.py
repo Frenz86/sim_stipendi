@@ -12,7 +12,7 @@ def main():
     st.title("Calcolo Stipendio Netto")
     st.image("aa.jpg")
 
-    nazione = st.selectbox("Paese / País / Pays / Land", ["Italia 🇮🇹", "Spagna 🇪🇸", "Francia 🇫🇷", "Germania 🇩🇪"])
+    nazione = st.selectbox("Paese / País / Pays / Land / Deutschland", ["Italia 🇮🇹", "Spagna 🇪🇸", "Francia 🇫🇷", "Germania 🇩🇪"])
 
     if nazione == "Italia 🇮🇹":
         italia.render_ui(fmt)
