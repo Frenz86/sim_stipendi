@@ -338,7 +338,7 @@ def render_ui(fmt):
                     "viene erogato alla cessazione del rapporto o come anticipo."
                 )
 
-            if modalita == "Costo Aziendale":
+            if modalita in ("RAL (Retribuzione Annua Lorda)", "Costo Aziendale", "Calcolatore completo"):
                 costo_val = ral * (1 + aliquota_inps_az)
                 inps_azienda = costo_val - ral
                 perc_az = aliquota_inps_az * 100
