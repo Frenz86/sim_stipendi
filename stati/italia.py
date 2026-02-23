@@ -4,6 +4,15 @@ import streamlit as st
 ALIQUOTA_INPS_DIPENDENTE = 0.0919
 ALIQUOTA_INPS_AZIENDA = 0.30  # ~30% contributi carico azienda (stima media)
 
+# --- Costanti Apprendistato Professionalizzante ---
+ALIQUOTA_INPS_DIPENDENTE_APPRENDISTATO = 0.0584  # 5,84%
+
+# Aliquote azienda per apprendistato (D.Lgs. 81/2015)
+# Aziende ≤9 dipendenti: agevolazione piena per anno di contratto
+# Aziende ≥10 dipendenti: aliquota ordinaria al 50% (stima ~15%)
+ALIQUOTE_INPS_AZIENDA_APPRENDISTATO_PICCOLA = {1: 0.015, 2: 0.030, 3: 0.050}
+ALIQUOTA_INPS_AZIENDA_APPRENDISTATO_GRANDE = 0.15
+
 # Scaglioni IRPEF 2024 (riforma a 3 aliquote)
 SCAGLIONI_IRPEF = [
     (28_000, 0.23),
@@ -103,9 +112,10 @@ def calcola_netto_annuo(
     aliquota_comunale: float = 0.0,
     coniuge_carico: bool = False,
     n_figli: int = 0,
+    aliquota_inps_dipendente: float = ALIQUOTA_INPS_DIPENDENTE,
 ) -> dict:
     """Dal RAL calcola il netto annuo con dettaglio completo."""
-    inps_dipendente = ral * ALIQUOTA_INPS_DIPENDENTE
+    inps_dipendente = ral * aliquota_inps_dipendente
     imponibile_irpef = ral - inps_dipendente
 
     irpef_lorda = calcola_irpef_lorda(imponibile_irpef)
@@ -136,6 +146,7 @@ def calcola_netto_annuo(
     return {
         "ral": ral,
         "inps_dipendente": inps_dipendente,
+        "aliquota_inps_dipendente": aliquota_inps_dipendente,
         "imponibile_irpef": imponibile_irpef,
         "irpef_lorda": irpef_lorda,
         "det_lavoro": det_lavoro,
@@ -155,6 +166,44 @@ def calcola_netto_annuo(
 
 def render_ui(fmt):
     st.caption("Simulazione basata su aliquote IRPEF 2024 (3 scaglioni) e contributi INPS standard")
+
+    tipo_contratto = st.selectbox(
+        "Tipo di contratto",
+        ["Lavoro dipendente standard", "Apprendistato professionalizzante"],
+    )
+
+    is_apprendistato = tipo_contratto == "Apprendistato professionalizzante"
+
+    if is_apprendistato:
+        st.info(
+            "**Apprendistato professionalizzante** (D.Lgs. 81/2015): "
+            "aliquota INPS dipendente ridotta al **5,84%** (vs 9,19% standard). "
+            "Il datore di lavoro beneficia di aliquote ridotte in base alla dimensione aziendale e all'anno di contratto."
+        )
+        col_app1, col_app2 = st.columns(2)
+        with col_app1:
+            dimensione_azienda = st.radio(
+                "Dimensione azienda",
+                ["≤ 9 dipendenti", "≥ 10 dipendenti"],
+                horizontal=True,
+            )
+        with col_app2:
+            anno_apprendistato = st.radio(
+                "Anno di apprendistato",
+                ["1° anno", "2° anno", "3° anno o successivi"],
+                horizontal=False,
+            )
+
+        aliquota_inps_dip = ALIQUOTA_INPS_DIPENDENTE_APPRENDISTATO
+
+        if dimensione_azienda == "≤ 9 dipendenti":
+            anno_idx = {"1° anno": 1, "2° anno": 2, "3° anno o successivi": 3}[anno_apprendistato]
+            aliquota_inps_az = ALIQUOTE_INPS_AZIENDA_APPRENDISTATO_PICCOLA[anno_idx]
+        else:
+            aliquota_inps_az = ALIQUOTA_INPS_AZIENDA_APPRENDISTATO_GRANDE
+    else:
+        aliquota_inps_dip = ALIQUOTA_INPS_DIPENDENTE
+        aliquota_inps_az = ALIQUOTA_INPS_AZIENDA
 
     modalita = st.selectbox(
         "Cosa vuoi inserire?",
@@ -201,7 +250,7 @@ def render_ui(fmt):
     elif modalita == "Costo Aziendale":
         costo = st.number_input("Inserisci il costo aziendale annuo (€)", min_value=0.0, value=40_000.0, step=500.0)
         mensilita = st.radio("Numero di mensilità", [13, 14], horizontal=True)
-        ral = ral_da_costo_aziendale(costo)
+        ral = costo / (1 + aliquota_inps_az)
         st.info(f"RAL stimata dal costo aziendale: **{fmt(ral)}**")
 
     elif modalita == "Calcolatore completo":
@@ -218,9 +267,10 @@ def render_ui(fmt):
                 aliquota_comunale=aliquota_comunale,
                 coniuge_carico=coniuge_carico,
                 n_figli=int(n_figli),
+                aliquota_inps_dipendente=aliquota_inps_dip,
             )
             netto_mensile = r["netto_annuo"] / mensilita
-            costo_aziendale = ral * (1 + ALIQUOTA_INPS_AZIENDA)
+            costo_aziendale = ral * (1 + aliquota_inps_az)
 
             st.divider()
             col1, col2, col3, col4 = st.columns(4)
@@ -235,7 +285,8 @@ def render_ui(fmt):
             voci = ["RAL (lordo annuo)"]
             importi = [fmt(r["ral"])]
 
-            voci.append("Contributi INPS dipendente (9,19%)")
+            perc_inps = r["aliquota_inps_dipendente"] * 100
+            voci.append(f"Contributi INPS dipendente ({perc_inps:.2f}%)")
             importi.append(f"- {fmt(r['inps_dipendente'])}")
 
             voci.append("Imponibile IRPEF")
@@ -288,10 +339,11 @@ def render_ui(fmt):
                 )
 
             if modalita == "Costo Aziendale":
-                costo_val = ral * (1 + ALIQUOTA_INPS_AZIENDA)
+                costo_val = ral * (1 + aliquota_inps_az)
                 inps_azienda = costo_val - ral
+                perc_az = aliquota_inps_az * 100
                 st.subheader("Dettaglio costo aziendale")
                 st.table({
-                    "Voce": ["RAL", "Contributi INPS azienda (~30%)", "Costo aziendale totale"],
+                    "Voce": ["RAL", f"Contributi INPS azienda ({perc_az:.1f}%)", "Costo aziendale totale"],
                     "Importo": [fmt(ral), fmt(inps_azienda), fmt(costo_val)],
                 })
