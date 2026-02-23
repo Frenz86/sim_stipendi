@@ -10,6 +10,7 @@ def fmt(v: float) -> str:
 
 def main():
     st.title("Calcolo Stipendio Netto")
+    st.warning("I risultati sono **approssimati**: la simulazione si basa su aliquote medie e stime. Non sostituisce una consulenza fiscale o del lavoro.")
     st.image("aa.jpg")
 
     nazione = st.selectbox("Paese / País / Pays / Land / Deutschland", ["Italia 🇮🇹", "Spagna 🇪🇸", "Francia 🇫🇷", "Germania 🇩🇪"])
