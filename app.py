@@ -4,24 +4,25 @@ from stati import italia, spagna, francia, germania
 st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
 hide_streamlit_style = """
     <style>
-        /* Nasconde il footer con il logo Streamlit */
+        /* Footer e menu */
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         
-        /* Nasconde il pulsante Fork e la toolbar in alto a destra */
-        .stToolbar {display: none !important;}
+        /* Toolbar Fork/GitHub */
         [data-testid="stToolbar"] {display: none !important;}
         
-        /* Nasconde il bottone "Manage app" in basso a destra */
-        .viewerBadge_container__r5tak {display: none !important;}
+        /* Linguetta nera della sidebar */
+        [data-testid="collapsedControl"] {display: none !important;}
+        
+        /* Se hai la sidebar aperta e vuoi nasconderla del tutto */
+        [data-testid="stSidebar"] {display: none !important;}
+        
+        /* Bottone hamburger */
+        button[kind="header"] {display: none !important;}
     </style>
 """
 
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-st.set_page_config(
-    page_title="La tua app",
-    initial_sidebar_state="collapsed"  # o "hidden" nelle versioni più recenti
-)
 
 
 def fmt(v: float) -> str:
