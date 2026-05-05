@@ -3,28 +3,15 @@ from stati import italia, spagna, francia, germania
 
 st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
 
-st.markdown("""
-    <style>
-        #MainMenu {visibility: hidden !important;}
-        footer {visibility: hidden !important;}
-        header {visibility: hidden !important;}
-        [data-testid="stToolbar"] {display: none !important;}
-        [data-testid="stStatusWidget"] {display: none !important;}
-        .stDeployButton {display: none !important;}
-    </style>
-
-    <script>
-        const observer = new MutationObserver(() => {
-            // Nasconde il badge "Deploy" di Streamlit Cloud
-            document.querySelectorAll('a[href*="streamlit.io/cloud"], a[href*="streamlit.io"], button[kind="header"]').forEach(el => el.style.display = 'none');
-            // Icona verde (status widget)
-            const status = document.querySelector('[data-testid="stStatusWidget"]');
-            if (status) status.style.display = 'none';
-        });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-    </script>
-""", unsafe_allow_html=True)
+hide_streamlit_style = """
+            <style>
+            [data-testid="stViewerBadge"] {display: none;}
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 
 def fmt(v: float) -> str:
