@@ -5,21 +5,34 @@ from stati import italia, spagna, francia, germania
 
 import streamlit as st
 
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            /* Questo mira specificamente al badge in basso a destra */
-            div[data-testid="stStatusWidget"] {display: none !important;}
-            .stAppDeployButton {display: none !important;}
-            /* Selettore universale per il viewer badge di Streamlit Cloud */
-            [data-testid="stViewerBadge"] {display: none !important;}
-            /* Rimuove lo spazio bianco aggiunto dal badge */
-            iframe[title="streamlitApp"] { margin-bottom: -2rem !important; }
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+# Usa st.html invece di st.markdown per una gestione più pulita del DOM
+st.html("""
+    <style>
+    /* 1. Nasconde il badge "Hosted with Streamlit" in basso a destra */
+    div[data-testid="stStatusWidget"], 
+    ._container_gzau3_1, 
+    ._viewerBadge_nim44_23, 
+    [data-testid="stViewerBadge"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* 2. Nasconde il pulsante "Deploy" in alto a destra */
+    .stAppDeployButton {
+        display: none !important;
+    }
+
+    /* 3. Nasconde il menu hamburger e il footer standard */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+
+    /* 4. Forza l'app a occupare tutto lo spazio eliminando il margine del badge */
+    #root > div:nth-child(1) > div > div > div > div > section > div {
+        padding-bottom: 0 !important;
+    }
+    </style>
+""")
 
 
 def fmt(v: float) -> str:
