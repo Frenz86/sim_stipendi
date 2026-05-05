@@ -31,35 +31,40 @@ def main():
 if __name__ == "__main__":
     main()
 
-    # --- IL KILLER DEL BADGE PARTE DA QUI ---
-    # Lo inseriamo alla fine così viene eseguito dopo che la UI è pronta
-    st.components.v1.html("""
-    <style>
-        /* CSS estremo: nasconde il contenitore e il link */
-        [data-testid="stViewerBadge"], 
-        ._container_gzau3_1, 
-        ._viewerBadge_nim44_23, 
-        a[href*="streamlit.io/cloud"],
-        footer {
+    # --- ULTIMISSIMA SPIAGGIA: IL "COPRI-BADGE" DINAMICO ---
+    st.markdown(
+        """
+        <style>
+        /* 1. CSS Universale: Colpisce ogni possibile tag A che porta a Streamlit */
+        iframe[title="streamlitApp"] + div a, 
+        a[href*="streamlit.io/cloud"], 
+        [data-testid="stViewerBadge"],
+        ._container_gzau3_1 {
             display: none !important;
-            visibility: hidden !important;
             opacity: 0 !important;
-            pointer-events: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            z-index: -1 !important;
         }
-    </style>
-    <script>
-        // Funzione per rimuovere il badge dal DOM superiore (parent)
-        function removeBadge() {
-            const badge = window.parent.document.querySelector('div[data-testid="stViewerBadge"]') || 
-                          window.parent.document.querySelector('._container_gzau3_1') ||
-                          window.parent.document.querySelector('a[href*="streamlit.io/cloud"]');
-            if (badge) {
-                badge.style.display = 'none';
-                badge.remove();
-            }
+
+        /* 2. Il "Tappo": Crea un rettangolo fisso sopra l'area del badge */
+        /* Usiamo un selettore che Streamlit non può bloccare facilmente */
+        html body div.stApp::after {
+            content: "";
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 150px; /* Copre la larghezza del badge */
+            height: 50px;  /* Copre l'altezza del badge */
+            background-color: #0e1117; /* <--- METTI QUI IL COLORE DEL TUO SFONDO */
+            z-index: 999999;
+            pointer-events: none;
         }
-        // Esegui subito e poi monitora ogni 400ms
-        removeBadge();
-        setInterval(removeBadge, 400);
-    </script>
-    """, height=0)
+        
+        /* Nasconde il footer classico */
+        footer {display:none !important;}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
