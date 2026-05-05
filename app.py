@@ -1,14 +1,22 @@
 import streamlit as st
 from stati import italia, spagna, francia, germania
 
-st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
+#st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
+
+import streamlit as st
 
 hide_streamlit_style = """
             <style>
-            [data-testid="stViewerBadge"] {display: none;}
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             header {visibility: hidden;}
+            /* Questo mira specificamente al badge in basso a destra */
+            div[data-testid="stStatusWidget"] {display: none !important;}
+            .stAppDeployButton {display: none !important;}
+            /* Selettore universale per il viewer badge di Streamlit Cloud */
+            [data-testid="stViewerBadge"] {display: none !important;}
+            /* Rimuove lo spazio bianco aggiunto dal badge */
+            iframe[title="streamlitApp"] { margin-bottom: -2rem !important; }
             </style>
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
