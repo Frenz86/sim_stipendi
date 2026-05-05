@@ -35,14 +35,22 @@ st.html(
     """
 )
 
+st.error("Se vedi ancora il badge, aggiungi questo blocco finale:")
 st.markdown(
     """
-    <div style="position: fixed; bottom: 0; right: 0; width: 150px; height: 50px; background: white; z-index: 999999;">
-    </div>
+    <div style="
+        position: fixed; 
+        bottom: 0; 
+        right: 0; 
+        width: 200px; 
+        height: 100px; 
+        background-color: #0e1117; /* Cambia con il colore del tuo sfondo */
+        z-index: 999999999;
+        pointer-events: none;
+    "></div>
     """,
     unsafe_allow_html=True
 )
-
 
 def fmt(v: float) -> str:
     return f"€ {int(round(v))}"
