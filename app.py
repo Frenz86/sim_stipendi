@@ -2,42 +2,46 @@ import streamlit as st
 from stati import italia, spagna, francia, germania
 
 #st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
-
 import streamlit as st
-import streamlit.components.v1 as components
 
-# 1. CSS di backup (per sicurezza)
-st.markdown("""
+# Iniezione aggressiva via st.html (disponibile nelle ultime versioni)
+st.html(
+    """
     <style>
-    [data-testid="stViewerBadge"], ._container_gzau3_1, footer {
+    /* Nasconde tutto ciò che ha classi legate al badge o al footer */
+    div[class*="viewerBadge"], 
+    a[class*="viewerBadge"], 
+    div[class*="styles_viewerBadge"],
+    div[data-testid="stViewerBadge"],
+    footer {
+        display: none !important;
+        height: 0 !important;
+        width: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Rimuove forzatamente lo spazio vuoto in fondo alla pagina */
+    .main .block-container {
+        padding-bottom: 0 !important;
+    }
+
+    /* Se il badge è dentro un iframe o un elemento fixed, questo lo colpisce */
+    iframe[src*="streamlit.io"] {
         display: none !important;
     }
     </style>
-""", unsafe_allow_html=True)
+    """
+)
 
-# 2. JAVASCRIPT (La soluzione definitiva per le ultime versioni)
-components.html("""
-<script>
-    const hideBadge = () => {
-        // Cerca il badge tramite il tag 'a' e la classe parziale
-        const badges = window.parent.document.querySelectorAll('a[class*="viewerBadge"]');
-        badges.forEach(badge => {
-            badge.style.display = 'none';
-            badge.style.visibility = 'hidden';
-        });
-        
-        // Cerca il badge tramite l'attributo data-testid
-        const testIdBadge = window.parent.document.querySelector('div[data-testid="stViewerBadge"]');
-        if (testIdBadge) {
-            testIdBadge.style.display = 'none';
-        }
-    };
-
-    // Esegui subito e poi ogni 500ms per intercettare caricamenti ritardati
-    hideBadge();
-    setInterval(hideBadge, 500);
-</script>
-""", height=0)
+st.markdown(
+    """
+    <div style="position: fixed; bottom: 0; right: 0; width: 150px; height: 50px; background: white; z-index: 999999;">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 def fmt(v: float) -> str:
