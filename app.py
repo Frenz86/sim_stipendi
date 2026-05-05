@@ -1,43 +1,52 @@
 import streamlit as st
 from stati import italia, spagna, francia, germania
 
-# 1. POSIZIONA QUESTO ALL'INIZIO (Sotto gli import)
-st.markdown('''
+# 1. QUESTA È LA SOLUZIONE "ULTIMATUM"
+# Va messa subito dopo gli import
+st.markdown(
+    """
     <style>
-    /* Nasconde il footer e il badge se accessibili */
-    footer {visibility: hidden !important;}
-    [data-testid="stViewerBadge"] {display: none !important;}
-    
-    /* CREIAMO UN COPRI-BADGE "STILE PATCH" */
-    /* Questo crea un rettangolo che sta SOPRA il badge di Streamlit */
+    /* Nasconde il footer originale */
+    footer {visibility: hidden !important; display: none !important;}
+
+    /* Crea un blocco fisso che segue lo zoom e copre l'angolo destro */
     .stApp > header + section::after {
         content: "";
         position: fixed;
         bottom: 0;
         right: 0;
-        width: 100vw; /* Copre tutta la larghezza per sicurezza */
-        height: 50px;
-        background-color: white; /* <--- CAMBIA IN #0e1117 SE USI IL TEMA SCURO */
-        z-index: 9999999;
+        width: 250px; /* Molto largo per coprire anche con lo zoom */
+        height: 60px;  /* Più alto del badge */
+        background-color: #ffffff; /* <--- USA #0e1117 SE IL TEMA È SCURO */
+        z-index: 999999999;
         pointer-events: none;
+        display: block !important;
     }
-    
-    /* Riduciamo il margine inferiore per non lasciare buchi bianchi */
-    .main .block-container {
-        padding-bottom: 0 !important;
-        margin-bottom: -50px !important;
+
+    /* Colpiamo duramente il badge con tutti i selettori conosciuti */
+    [data-testid="stViewerBadge"], 
+    ._container_gzau3_1, 
+    ._viewerBadge_nim44_23,
+    a[href*="streamlit.io/cloud"] {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: scale(0) !important; /* Lo rimpicciolisce a zero */
     }
     </style>
-''', unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
 def fmt(v: float) -> str:
     return f"€ {int(round(v))}"
 
 def main():
     st.title("Calcolo Stipendio Netto")
-    st.warning("I risultati sono **approssimati**: la simulazione si basa su aliquote medie e stime.")
+    st.warning("I risultati sono approssimati: la simulazione si basa su aliquote medie e stime.")
     
-    # Prova a caricare l'immagine, gestendo l'errore se manca
+    # Gestione immagine sicura
     try:
         st.image("aa.jpg")
     except:
