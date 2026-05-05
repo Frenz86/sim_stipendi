@@ -1,8 +1,34 @@
 import streamlit as st
 from stati import italia, spagna, francia, germania
 
-# Configurazione pagina (opzionale)
-# st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
+# 1. POSIZIONA QUESTO ALL'INIZIO (Sotto gli import)
+st.markdown('''
+    <style>
+    /* Nasconde il footer e il badge se accessibili */
+    footer {visibility: hidden !important;}
+    [data-testid="stViewerBadge"] {display: none !important;}
+    
+    /* CREIAMO UN COPRI-BADGE "STILE PATCH" */
+    /* Questo crea un rettangolo che sta SOPRA il badge di Streamlit */
+    .stApp > header + section::after {
+        content: "";
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100vw; /* Copre tutta la larghezza per sicurezza */
+        height: 50px;
+        background-color: white; /* <--- CAMBIA IN #0e1117 SE USI IL TEMA SCURO */
+        z-index: 9999999;
+        pointer-events: none;
+    }
+    
+    /* Riduciamo il margine inferiore per non lasciare buchi bianchi */
+    .main .block-container {
+        padding-bottom: 0 !important;
+        margin-bottom: -50px !important;
+    }
+    </style>
+''', unsafe_allow_html=True)
 
 def fmt(v: float) -> str:
     return f"€ {int(round(v))}"
@@ -30,41 +56,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # --- ULTIMISSIMA SPIAGGIA: IL "COPRI-BADGE" DINAMICO ---
-    st.markdown(
-        """
-        <style>
-        /* 1. CSS Universale: Colpisce ogni possibile tag A che porta a Streamlit */
-        iframe[title="streamlitApp"] + div a, 
-        a[href*="streamlit.io/cloud"], 
-        [data-testid="stViewerBadge"],
-        ._container_gzau3_1 {
-            display: none !important;
-            opacity: 0 !important;
-            visibility: hidden !important;
-            width: 0 !important;
-            height: 0 !important;
-            z-index: -1 !important;
-        }
-
-        /* 2. Il "Tappo": Crea un rettangolo fisso sopra l'area del badge */
-        /* Usiamo un selettore che Streamlit non può bloccare facilmente */
-        html body div.stApp::after {
-            content: "";
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            width: 150px; /* Copre la larghezza del badge */
-            height: 50px;  /* Copre l'altezza del badge */
-            background-color: #0e1117; /* <--- METTI QUI IL COLORE DEL TUO SFONDO */
-            z-index: 999999;
-            pointer-events: none;
-        }
-        
-        /* Nasconde il footer classico */
-        footer {display:none !important;}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
