@@ -2,27 +2,29 @@ import streamlit as st
 from stati import italia, spagna, francia, germania
 
 st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
-hide_streamlit_style = """
+st.markdown("""
     <style>
-        /* Footer e menu */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
+        /* Nascondi tutto quello che Streamlit aggiunge */
+        #MainMenu, footer, header {visibility: hidden !important;}
         
-        /* Toolbar Fork/GitHub */
-        [data-testid="stToolbar"] {display: none !important;}
+        [data-testid="stToolbar"],
+        [data-testid="stDecoration"],
+        [data-testid="stStatusWidget"],
+        [data-testid="collapsedControl"],
+        [data-testid="baseButton-headerNoPadding"] {
+            display: none !important;
+        }
         
-        /* Linguetta nera della sidebar */
-        [data-testid="collapsedControl"] {display: none !important;}
+        /* Forza rimozione sidebar toggle con selettore generico */
+        section[data-testid="stSidebarCollapsedControl"] {
+            display: none !important;
+        }
         
-        /* Se hai la sidebar aperta e vuoi nasconderla del tutto */
-        [data-testid="stSidebar"] {display: none !important;}
-        
-        /* Bottone hamburger */
-        button[kind="header"] {display: none !important;}
+        /* Approccio nucleare: nascondi tutti i button nell'header */
+        header button {display: none !important;}
+        header {display: none !important;}
     </style>
-"""
-
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 
 def fmt(v: float) -> str:
