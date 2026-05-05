@@ -9,15 +9,21 @@ st.markdown("""
         footer {visibility: hidden !important;}
         header {visibility: hidden !important;}
         [data-testid="stToolbar"] {display: none !important;}
-        [data-testid="stDecoration"] {display: none !important;}
-        [data-testid="stStatusWidget"] {display: none !important;}
-        [data-testid="collapsedControl"] {display: none !important;}
-
-        /* Badge Streamlit Cloud (linguetta) */
-        a[href="https://streamlit.io/cloud"] {display: none !important;}
-        ._viewerBadge_nim44_23 {display: none !important;}
-        ._container_gzau3_1 {display: none !important;}
     </style>
+
+    <script>
+        const observer = new MutationObserver(() => {
+            // Badge Streamlit Cloud (corona rossa)
+            const badge = document.querySelector('a[href="https://streamlit.io/cloud"]');
+            if (badge) badge.style.display = 'none';
+
+            // Icona verde (status widget)
+            const status = document.querySelector('[data-testid="stStatusWidget"]');
+            if (status) status.style.display = 'none';
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    </script>
 """, unsafe_allow_html=True)
 
 
