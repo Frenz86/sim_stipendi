@@ -20,10 +20,8 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 st.markdown("""
     <style>
-        /* Nasconde il badge "Hosted on Streamlit" */
-        a[href="https://streamlit.io/cloud"] {
-            display: none !important;
-        }
+        ._viewerBadge_nim44_23 {display: none !important;}
+        ._container_gzau3_1 {display: none !important;}
     </style>
 """, unsafe_allow_html=True)
 
