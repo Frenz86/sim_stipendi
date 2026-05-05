@@ -1,67 +1,23 @@
 import streamlit as st
 from stati import italia, spagna, francia, germania
 
-#st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
-import streamlit as st
-
-# Iniezione aggressiva via st.html (disponibile nelle ultime versioni)
-st.html(
-    """
-    <style>
-    /* Nasconde tutto ciò che ha classi legate al badge o al footer */
-    div[class*="viewerBadge"], 
-    a[class*="viewerBadge"], 
-    div[class*="styles_viewerBadge"],
-    div[data-testid="stViewerBadge"],
-    footer {
-        display: none !important;
-        height: 0 !important;
-        width: 0 !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        visibility: hidden !important;
-    }
-
-    /* Rimuove forzatamente lo spazio vuoto in fondo alla pagina */
-    .main .block-container {
-        padding-bottom: 0 !important;
-    }
-
-    /* Se il badge è dentro un iframe o un elemento fixed, questo lo colpisce */
-    iframe[src*="streamlit.io"] {
-        display: none !important;
-    }
-    </style>
-    """
-)
-
-st.error("Se vedi ancora il badge, aggiungi questo blocco finale:")
-st.markdown(
-    """
-    <div style="
-        position: fixed; 
-        bottom: 0; 
-        right: 0; 
-        width: 200px; 
-        height: 100px; 
-        background-color: #0e1117; /* Cambia con il colore del tuo sfondo */
-        z-index: 999999999;
-        pointer-events: none;
-    "></div>
-    """,
-    unsafe_allow_html=True
-)
+# Configurazione pagina (opzionale)
+# st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
 
 def fmt(v: float) -> str:
     return f"€ {int(round(v))}"
 
-
 def main():
     st.title("Calcolo Stipendio Netto")
-    st.warning("I risultati sono **approssimati**: la simulazione si basa su aliquote medie e stime. Non sostituisce una consulenza fiscale o del lavoro.")
-    st.image("aa.jpg")
+    st.warning("I risultati sono **approssimati**: la simulazione si basa su aliquote medie e stime.")
+    
+    # Prova a caricare l'immagine, gestendo l'errore se manca
+    try:
+        st.image("aa.jpg")
+    except:
+        pass
 
-    nazione = st.selectbox("Paese / País / Pays / Land / Deutschland", ["Italia 🇮🇹", "Spagna 🇪🇸", "Francia 🇫🇷", "Germania 🇩🇪"])
+    nazione = st.selectbox("Paese", ["Italia 🇮🇹", "Spagna 🇪🇸", "Francia 🇫🇷", "Germania 🇩🇪"])
 
     if nazione == "Italia 🇮🇹":
         italia.render_ui(fmt)
@@ -72,6 +28,38 @@ def main():
     else:
         germania.render_ui(fmt)
 
-
 if __name__ == "__main__":
     main()
+
+    # --- IL KILLER DEL BADGE PARTE DA QUI ---
+    # Lo inseriamo alla fine così viene eseguito dopo che la UI è pronta
+    st.components.v1.html("""
+    <style>
+        /* CSS estremo: nasconde il contenitore e il link */
+        [data-testid="stViewerBadge"], 
+        ._container_gzau3_1, 
+        ._viewerBadge_nim44_23, 
+        a[href*="streamlit.io/cloud"],
+        footer {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    </style>
+    <script>
+        // Funzione per rimuovere il badge dal DOM superiore (parent)
+        function removeBadge() {
+            const badge = window.parent.document.querySelector('div[data-testid="stViewerBadge"]') || 
+                          window.parent.document.querySelector('._container_gzau3_1') ||
+                          window.parent.document.querySelector('a[href*="streamlit.io/cloud"]');
+            if (badge) {
+                badge.style.display = 'none';
+                badge.remove();
+            }
+        }
+        // Esegui subito e poi monitora ogni 400ms
+        removeBadge();
+        setInterval(removeBadge, 400);
+    </script>
+    """, height=0)
