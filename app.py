@@ -3,28 +3,23 @@ from stati import italia, spagna, francia, germania
 
 st.set_page_config(page_title="Calcolo Stipendio Netto", page_icon="💰", layout="centered")
 
-st.markdown("""
-    <style>
-        #MainMenu {visibility: hidden !important;}
-        footer {visibility: hidden !important;}
-        header {visibility: hidden !important;}
-        [data-testid="stToolbar"] {display: none !important;}
-    </style>
+import os, streamlit as _st
 
-    <script>
-        const observer = new MutationObserver(() => {
-            // Badge Streamlit Cloud (corona rossa)
-            const badge = document.querySelector('a[href="https://streamlit.io/cloud"]');
-            if (badge) badge.style.display = 'none';
+# Patch dell'index.html di Streamlit (equivalente al sed del Dockerfile)
+_index = os.path.join(os.path.dirname(_st.__file__), "static", "index.html")
+with open(_index, "r") as f:
+    _html = f.read()
 
-            // Icona verde (status widget)
-            const status = document.querySelector('[data-testid="stStatusWidget"]');
-            if (status) status.style.display = 'none';
-        });
+_css = '<style>a[href="https://streamlit.io/cloud"]{display:none!important;}[data-testid="stToolbar"]{display:none!important;}[data-testid="stStatusWidget"]{display:none!important;}footer{visibility:hidden!important;}header{visibility:hidden!important;}</style>'
 
-        observer.observe(document.body, { childList: true, subtree: true });
-    </script>
-""", unsafe_allow_html=True)
+if _css not in _html:
+    with open(_index, "w") as f:
+        f.write(_html.replace("</head>", _css + "</head>"))
+
+# --- il tuo codice normale da qui ---
+from stati import italia, spagna, francia, germania
+
+st.set_page_config(...)
 
 
 def fmt(v: float) -> str:
