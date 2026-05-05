@@ -18,7 +18,10 @@ hide_streamlit_style = """
 """
 
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
+st.set_page_config(
+    page_title="La tua app",
+    initial_sidebar_state="hidden"  # o "hidden" nelle versioni più recenti
+)
 
 
 def fmt(v: float) -> str:
